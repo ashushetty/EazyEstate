@@ -1,23 +1,23 @@
 import { DataTypes } from "sequelize";
-import getConnection from "../database";
+import getConnection from "../database.js";
 import { toDefaultValue } from "sequelize/lib/utils";
 
 const userModel={
    
     username:{
-        type:String,
+        type:DataTypes.STRING,
         required:true,
         unique:true
 
     },
     email:{
-        type:DataTypes.email,
+        type:DataTypes.STRING,
         required:true,
         
 
     },
     password:{
-        type:String,
+        type:DataTypes.STRING,
         required:true,
     
 
@@ -29,11 +29,11 @@ const inituserData = async ()=>{
     try{
         if(user) return user;
         const sequelize = await getConnection();
-        user= sequelize.define("users",userModel,{
+        user= sequelize.define("user",userModel,{
             freezeTableName:true,
         });
 
-        await user.sync({alter:true}):
+        await user.sync({alter:true});
         return user;
         }catch(err){
         console.log("user-model-error", err.message);

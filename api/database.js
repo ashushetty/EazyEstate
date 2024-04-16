@@ -5,12 +5,12 @@ let connection = null;
 const getConnection = async () => {
     if (!connection) {
         connection = new Sequelize({
-            database: process.env.DATABASE,
+            database: process.env.DB,
             username: process.env.DBUSER,
-            password:process.env.DBPASS,
+            password: process.env.DBPASS,
             dialect: "postgres",
             host: process.env.DBHOST,
-            port: process.env.DBPORT,
+            port: process.env.PORT,
             logging: false,
             pool: {
                 min: 0,

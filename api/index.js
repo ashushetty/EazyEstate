@@ -5,10 +5,12 @@ import dotenv from "dotenv";
 import getConnection from "./database.js";
 import path from "path";
 import cors from "cors"
+import userRouter from "./routes/user.routes.js";
+import authRouter from "./routes/auth.route.js"
 const __dirname = path.resolve();
 dotenv.config();
 
-const PORT = process.env.PORT || 4000;
+const PORT =  4000;
 
 app.use(cors())
 app.use(express.json());
@@ -20,3 +22,6 @@ getConnection();
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+app.use('/api/user',userRouter);
+app.use('/api/auth',authRouter);
