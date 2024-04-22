@@ -5,6 +5,7 @@ import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import { Toaster } from "react-hot-toast";
 
 
 
@@ -22,7 +23,7 @@ function App() {
         <Route path="/about" element={<About/>}/>
         <Route path="/profile" element={<Profile/>}/>
       </Routes>
-      
+      <Toaster position="bottom-center" reverseOrder={false} />
   </div>
 
  

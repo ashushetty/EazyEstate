@@ -31,7 +31,17 @@ export  const signup= async(req, res)=>{
         );
         return send (res,updatedResponse);
     }
-    
+    const isExistingEmail= await newuser.findOne({
+        where:{
+            email:email,
+        }
+
+    })
+
+    if(isExistingEmail){
+        const updatedResponse = setErrResMsg(RESPONSE.EXISTING_DATA,"Email");
+        return send(res,updatedResponse);
+    }
     const encryptedPassword =  bcrypt.hashSync(password, 10);
     
 

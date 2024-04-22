@@ -5,7 +5,7 @@ const RESPONSE={
     },
     UNKNOW_ERROR:{
         code:500,
-        message:"Something went wrong!",
+        message:"Internal Server Error...!",
     },
     REQUIRED_PARAMS:{
         code:201,
