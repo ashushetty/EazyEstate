@@ -1,27 +1,30 @@
 import { DataTypes } from "sequelize";
 import getConnection from "../database.js";
-import { toDefaultValue } from "sequelize/lib/utils";
 
-const userModel={
-   
-    username:{
-        type:DataTypes.STRING,
-        required:true,
-        unique:true
 
-    },
-    email:{
-        type:DataTypes.STRING,
-        required:true,
-        
 
-    },
-    password:{
-        type:DataTypes.STRING,
-        required:true,
-    
-
-    },
+const userModel = {
+  user_id: {
+    type: DataTypes.UUID,
+    primaryKey: true,
+    defaultValue: DataTypes.UUIDV4,
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  isactive: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+  },
 };
 
 let user=null;
@@ -29,7 +32,7 @@ const inituserData = async ()=>{
     try{
         if(user) return user;
         const sequelize = await getConnection();
-        user= sequelize.define("user",userModel,{
+        user= sequelize.define("users",userModel,{
             freezeTableName:true,
         });
 

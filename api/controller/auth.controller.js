@@ -1,7 +1,8 @@
 import RESPONSE from '../config/global.js';
 import { send, setErrResMsg } from '../helper/responseHelper.js';
 import inituserData from '../models/user.model.js';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export  const signup= async(req, res)=>{
     try{
@@ -60,4 +61,50 @@ export  const signup= async(req, res)=>{
     }
     
     
+}
+
+
+export const signin= async (req,res,)=>{
+    try{
+        const {email, password}= req.body;
+        const newUser = await inituserData();
+        if(!email|| email==""){
+            const  updatedResponse =setErrResMsg(RESPONSE.REQUIRED_PARAMS,"email");
+            return send(res,updatedResponse);
+        }
+
+        if(!password || password== ""){
+
+            const updatedResponse = setErrResMsg(
+                RESPONSE.REQUIRED_PARAMS,
+                "password");
+            return send(res, updatedResponse);
+    }
+    const userData= await newUser.findOne({
+        where:{
+            email:email,
+        },
+    });
+
+    if(userData && (await bcrypt.compare(password, userData.password))){
+        const token = jwt.sign(
+            {
+                id:userData.user_id,
+                username:userData.username,
+                email:email,
+            },
+            process.env.JWT_SECRETKEY,
+
+        );
+        // res.cookie('access_token',token, {httpOnly:true }).stuatus(200).json(userData);
+
+        return send(res,RESPONSE.SUCCESS, token);
+    }else{
+        return send(res, RESPONSE.CREDENTIAL_ERROR);
+    }
+    }
+    catch(err){
+        console.log(err.stack);
+        return send(res,RESPONSE.UNKNOW_ERROR);
+    }
 }
