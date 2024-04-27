@@ -2,6 +2,8 @@ import { FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
+  const user_email = localStorage.getItem("token");
+  console.log(user_email);
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
