@@ -131,7 +131,7 @@ export const google= async(req, res)=>{
         username: req.body.name.split(" ").join("").toLowerCase()+Math.random().toString(36).slice(-8),
         email: req.body.email,
         password:hashedPassword ,
-        avatar:req.body.image
+        avatar:req.body.avatar
       });
   
       const token = jwt.sign(

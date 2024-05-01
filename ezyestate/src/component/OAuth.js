@@ -21,7 +21,7 @@ function OAuth() {
               body: JSON.stringify({
                 name:result.user.displayName,
                 email:result.user.email,
-                image:result.user.photoURL
+                avatar:result.user.photoURL
               }),
   
             });

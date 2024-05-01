@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import { Toaster } from "react-hot-toast";
+import PrivateRoute from "./component/PrivateRoute";
 
 
 
@@ -21,7 +22,9 @@ function App() {
         <Route path="/sign-in" element={<SignIn/>}/>
         <Route path="/sign-up" element={<SignUp/>}/>
         <Route path="/about" element={<About/>}/>
-        <Route path="/profile" element={<Profile/>}/>
+        <Route element={<PrivateRoute/>}>
+          <Route path="/profile" element={<Profile/>}/>
+        </Route>
       </Routes>
       <Toaster position="bottom-center" reverseOrder={false} />
   </div>
