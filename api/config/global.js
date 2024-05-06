@@ -5,7 +5,27 @@ const RESPONSE={
     },
     UNKNOW_ERROR:{
         code:500,
-        message:"Internal Server Error...!",
+        message:"OOPs you have encountered a UNKNOWN error...!",
+    },
+    UNAUTHORIZED:{
+        code:401,
+        message:"err-Unauthorized!",
+    },
+    FORBIDDEN:{
+        code:403,
+        message:"Forbidden!",
+    },
+    UNAUTHENTICATED:{
+        code:401,
+        message:"You are not authorized.!",
+    },
+    UNAUTHORIZED:{
+        code:402,
+        message:"You can only update your own account.",
+    },
+    FORBIDDEN:{
+        code:403,
+        message:"Forbidden.!",
     },
     REQUIRED_PARAMS:{
         code:201,

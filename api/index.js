@@ -7,6 +7,8 @@ import path from "path";
 import cors from "cors"
 import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.route.js"
+import cookieParser from 'cookie-parser';
+
 const __dirname = path.resolve();
 dotenv.config();
 
@@ -16,7 +18,7 @@ app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
-
+app.use(cookieParser());
 getConnection();
 
 app.listen(PORT, () => {
