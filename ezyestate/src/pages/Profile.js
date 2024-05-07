@@ -7,6 +7,8 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import {updateUserStart,updateUserSuccess,updateUserFailure} from '../redux/user/userSlice'
+import { useDispatch } from "react-redux";
 
 function Profile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -15,10 +17,11 @@ function Profile() {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const dispatch= useDispatch();
 
-  console.log(formData);
-  console.log(filePerc);
-  console.log(fileUploadError);
+   console.log(formData);
+  // console.log(filePerc);
+  // console.log(fileUploadError);
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
@@ -48,10 +51,45 @@ function Profile() {
       }
     );
   };
+
+  const handleChange=(e)=>{
+      setFormData({ ...formData, [e.target.id]:e.target.value })
+      
+  }
+
+  const handleSubmit = async(e)=>{
+    e.preventDefault();
+    try{
+      dispatch(updateUserStart());
+      const res = await fetch(`http://localhost:4000/api/user/update/${currentUser.user_id}`,{
+        method:'POST',
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(formData),
+      });
+
+      const data= await res.json()
+      if(data.success === false){
+        
+        dispatch(updateUserFailure(data.message));
+        return;
+
+      }
+      console.log(currentUser.user_id);
+      console.log("control comes here");
+      console.log(data);
+      dispatch(updateUserSuccess(data));
+
+
+    }catch(err){
+      dispatch(updateUserFailure(err));
+    }
+  }
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form  onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -84,20 +122,28 @@ function Profile() {
           type="text"
           id="username"
           placeholder="username"
+          defaultValue={currentUser.username}
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           type="email"
           id="email"
           placeholder="email"
+          defaultValue={currentUser.email}
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           type="password"
           id="password"
           placeholder="password"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
+          
+          
         />
+        
         <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
           Update
         </button>

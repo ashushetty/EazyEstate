@@ -92,6 +92,8 @@ export const signin = async (req, res) => {
         //  .status(200)
         //  .json(rest);
 
+        console.log(cookie.access_token);
+
        return send(res,RESPONSE.SUCCESS, rest);
     } else {
       return send(res, RESPONSE.CREDENTIAL_ERROR);
