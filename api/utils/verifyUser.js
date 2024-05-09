@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 export const verifyToken = (req, res, next) => {
   //   const token = req.cookies.access_token;
   const token = req.headers["access_token"];
-  console.log(token);
+  // console.log(token);
   if (!token) return send(res, RESPONSE.ACCESS_DENIED);
 
   try {

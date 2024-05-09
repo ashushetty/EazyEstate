@@ -40,7 +40,7 @@ export default function Navbar() {
             {userData2 ? (
               <img
                 className="rounded-full h-10 w-10 object-cover"
-                src={userData2.avatar}
+                src={userData2.avatar||userData2?.responseData?.data?.avatar}
                 alt="profile"
               />
             ) : (

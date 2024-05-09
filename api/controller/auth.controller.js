@@ -129,11 +129,11 @@ export const google= async(req, res)=>{
       //  console.log(token)
        return send(res,RESPONSE.SUCCESS, {data: rest, access_token: token});
        
-      // console.log(user)
+      //  console.log(user)
     }else{
       const generatedPassword = Math.random().toString(36).slice(-8)+ Math.random().toString(36).slice(-8);
       const hashedPassword= bcrypt.hashSync(generatedPassword, 10);
-      await User.create({
+      const newUser= await User.create({
         username: req.body.name.split(" ").join("").toLowerCase()+Math.random().toString(36).slice(-8),
         email: req.body.email,
         password:hashedPassword ,
@@ -142,12 +142,12 @@ export const google= async(req, res)=>{
   
       const token = jwt.sign(
         {
-          id: user.user_id,
+          id: newUser.user_id,
          
         },
         process.env.JWT_SECRETKEY
       );
-      const {password:password, ...rest}=user.dataValues;
+      const {password:password, ...rest}=newUser.dataValues;
       
         // .cookie("access_token", token, { httpOnly: true })
         //  .status(200)

@@ -31,7 +31,7 @@ function Signin() {
         password: formData.password,
       });
 
-      console.log(res);
+      // console.log(res);
 
       if (res.data.responseCode === 200) {
         toast.success("Log in succesfull!");
@@ -56,7 +56,7 @@ function Signin() {
       setLoading(false);
     }
   };
-  console.log(formData);
+  // console.log(formData);
 
   return (
     <div className="p-3 max-w-lg mx-auto">

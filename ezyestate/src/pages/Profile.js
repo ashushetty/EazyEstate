@@ -14,6 +14,7 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 
 function Profile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -29,8 +30,8 @@ function Profile() {
   const decoded = jwtDecode(access_token);
   const userData2 = JSON.parse(userData);
 
-  console.log(userData2);
-
+  //  console.log(userData2);
+  //  console.log(userData2.responseData.data.avatar)
   // console.log(filePerc);
   // console.log(fileUploadError);
   useEffect(() => {
@@ -94,8 +95,10 @@ function Profile() {
       const data = await res.json();
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
+        toast.error("OOPs Profile update unsuccessfull!",data.message);
         return;
       }
+      toast.success("Profile updated successfully!");
       const updatedUserData = { ...userData2, ...formData };
       localStorage.setItem("user_data", JSON.stringify(updatedUserData));
 
@@ -122,10 +125,7 @@ function Profile() {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={
-            formData?.avatar == undefined ? userData2.avatar : formData?.avatar
-          }
-          // src={userData2.avatar}
+          src={formData.avatar || userData2?.avatar||userData2?.responseData?.data?.avatar}
           alt="profile"
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
         />
@@ -146,7 +146,8 @@ function Profile() {
           type="text"
           id="username"
           placeholder="username"
-          defaultValue={currentUser.username}
+          required
+          defaultValue={currentUser.username||userData2?.responseData?.data?.username }
           className="border p-3 rounded-lg"
           value={formData.username}
           onChange={handleChange}
@@ -155,7 +156,7 @@ function Profile() {
           type="email"
           id="email"
           placeholder="email"
-          defaultValue={currentUser.email}
+          defaultValue={currentUser.email||userData2?.responseData?.data?.email}
           className="border p-3 rounded-lg"
           onChange={handleChange}
           value={formData.email}
@@ -167,7 +168,7 @@ function Profile() {
           className="border p-3 rounded-lg"
           onChange={handleChange}
         />
-
+  
         <button
           type="submit"
           className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
@@ -181,6 +182,7 @@ function Profile() {
       </div>
     </div>
   );
+  
 }
 
 export default Profile;
