@@ -27,6 +27,11 @@ function OAuth() {
             });
             const data= await res.json();
             dispatch(signInSuccess(data));
+            localStorage.setItem('user_data',JSON.stringify(data));
+            localStorage.setItem(
+          "access_token",
+          data.responseData.access_token
+        );
             toast.success("Log in succesfull!");
             navigate('/');
         }catch(error){

@@ -87,17 +87,20 @@ export const signin = async (req, res) => {
         process.env.JWT_SECRETKEY
       );
       const {password:password, ...rest}=userData.dataValues;
-      res
-        .cookie("access_token", token, { httpOnly: true })
+      // res
+      //   .cookie("access_token", token, { httpOnly: true })
         //  .status(200)
         //  .json(rest);
+        // Assuming `req` is the Express request object
+        
+        // const accessToken = req.cookies.access_token;
 
-        console.log(cookie.access_token);
+        // console.log("cookie",accessToken);
 
-       return send(res,RESPONSE.SUCCESS, rest);
+       return send(res,RESPONSE.SUCCESS, {data: rest, access_token: token});
     } else {
       return send(res, RESPONSE.CREDENTIAL_ERROR);
-    }
+    }   
   } catch (err) {
     console.log(err.stack);
     return send(res, RESPONSE.UNKNOW_ERROR);
@@ -119,13 +122,14 @@ export const google= async(req, res)=>{
         process.env.JWT_SECRETKEY
       );
       const {password:password, ...rest}=user.dataValues;
-      res
-        .cookie("access_token", token, { httpOnly: true })
-          .status(200)
-          .json(rest);
-
-       //return send(res,RESPONSE.SUCCESS, rest);
-       console.log(user)
+      // res
+      //   .cookie("access_token", token, { httpOnly: true })
+      //     .status(200)
+      //     .json(rest);
+      //  console.log(token)
+       return send(res,RESPONSE.SUCCESS, {data: rest, access_token: token});
+       
+      // console.log(user)
     }else{
       const generatedPassword = Math.random().toString(36).slice(-8)+ Math.random().toString(36).slice(-8);
       const hashedPassword= bcrypt.hashSync(generatedPassword, 10);
@@ -144,12 +148,12 @@ export const google= async(req, res)=>{
         process.env.JWT_SECRETKEY
       );
       const {password:password, ...rest}=user.dataValues;
-      res
-        .cookie("access_token", token, { httpOnly: true })
+      
+        // .cookie("access_token", token, { httpOnly: true })
         //  .status(200)
         //  .json(rest);
-
-       return send(res,RESPONSE.SUCCESS, rest);
+       return send(res,RESPONSE.SUCCESS, {data: rest, access_token: token});
+       
     }
 
   }catch(err){

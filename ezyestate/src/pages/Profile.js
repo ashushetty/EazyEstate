@@ -7,8 +7,13 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
-import {updateUserStart,updateUserSuccess,updateUserFailure} from '../redux/user/userSlice'
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 
 function Profile() {
   const { currentUser } = useSelector((state) => state.user);
@@ -17,15 +22,27 @@ function Profile() {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
-  const dispatch= useDispatch();
+  const dispatch = useDispatch();
 
-   console.log(formData);
+  const access_token = localStorage.getItem("access_token");
+  const userData = localStorage.getItem("user_data");
+  const decoded = jwtDecode(access_token);
+  const userData2 = JSON.parse(userData);
+
+  console.log(userData2);
+
   // console.log(filePerc);
   // console.log(fileUploadError);
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
     }
+
+    setFormData({
+      ...formData,
+      username: userData2.username,
+      email: userData2.email,
+    });
   }, [file]);
 
   const handleFileUpload = (file) => {
@@ -52,44 +69,50 @@ function Profile() {
     );
   };
 
-  const handleChange=(e)=>{
-      setFormData({ ...formData, [e.target.id]:e.target.value })
-      
-  }
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
 
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      dispatch(updateUserStart());
-      const res = await fetch(`http://localhost:4000/api/user/update/${currentUser.user_id}`,{
-        method:'POST',
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify(formData),
-      });
 
-      const data= await res.json()
-      if(data.success === false){
-        
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(
+        // `http://localhost:4000/api/user/update/${currentUser.user_id}`,
+        `http://localhost:4000/api/user/update/${decoded.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            access_token: access_token,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await res.json();
+      if (data.success === false) {
         dispatch(updateUserFailure(data.message));
         return;
-
       }
-      console.log(currentUser.user_id);
-      console.log("control comes here");
-      console.log(data);
+      const updatedUserData = { ...userData2, ...formData };
+      localStorage.setItem("user_data", JSON.stringify(updatedUserData));
+
+      
+      // console.log(currentUser.user_id);
+      // console.log("control comes here");
+      // console.log(data, decoded);
       dispatch(updateUserSuccess(data));
-
-
-    }catch(err){
+    } catch (err) {
       dispatch(updateUserFailure(err));
     }
-  }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form  onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -99,24 +122,25 @@ function Profile() {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={formData.avatar || currentUser.avatar}
+          src={
+            formData?.avatar == undefined ? userData2.avatar : formData?.avatar
+          }
+          // src={userData2.avatar}
           alt="profile"
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
         />
         <p className="text-sm self-center ">
-          {fileUploadError?(
-          <span className="text-red-700">
-            Error Image Upload (Image must be less than 2mb)
-          </span>) :
-          filePerc > 0 && filePerc < 100 ? (
-            <span className="text-green-700"> {`Uploading ${filePerc}%`}</span>
-          ) :
-          filePerc === 100? (
-            <span className="text-green-700">
-              Successfully Uploaded
+          {fileUploadError ? (
+            <span className="text-red-700">
+              Error Image Upload (Image must be less than 2mb)
             </span>
-          ): ("")
-          }
+          ) : filePerc > 0 && filePerc < 100 ? (
+            <span className="text-green-700"> {`Uploading ${filePerc}%`}</span>
+          ) : filePerc === 100 ? (
+            <span className="text-green-700">Successfully Uploaded</span>
+          ) : (
+            ""
+          )}
         </p>
         <input
           type="text"
@@ -124,6 +148,7 @@ function Profile() {
           placeholder="username"
           defaultValue={currentUser.username}
           className="border p-3 rounded-lg"
+          value={formData.username}
           onChange={handleChange}
         />
         <input
@@ -133,6 +158,7 @@ function Profile() {
           defaultValue={currentUser.email}
           className="border p-3 rounded-lg"
           onChange={handleChange}
+          value={formData.email}
         />
         <input
           type="password"
@@ -140,11 +166,12 @@ function Profile() {
           placeholder="password"
           className="border p-3 rounded-lg"
           onChange={handleChange}
-          
-          
         />
-        
-        <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
+
+        <button
+          type="submit"
+          className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
+        >
           Update
         </button>
       </form>

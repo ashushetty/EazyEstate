@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function Navbar() {
-  const {currentUser} = useSelector((state) => state.user)
+  const { currentUser } = useSelector((state) => state.user);
+  const userData = localStorage.getItem("user_data");
+  const userData2 = JSON.parse(userData);
+
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
@@ -23,25 +26,27 @@ export default function Navbar() {
           <FaSearch className="text-slate-600" />
         </form>
         <ul className="flex gap-4">
-          <Link to='/'>
+          <Link to="/">
             <li className="hidden sm:inline text-slate-700 hover:underline">
               Home
             </li>
           </Link>
-          <Link to='/about'>
+          <Link to="/about">
             <li className="hidden sm:inline  text-slate-700 hover:underline">
               About
             </li>
           </Link>
-          <Link to='/profile'>
-           {currentUser ?(
-            <img  className="rounded-full h-10 w-10 object-cover" src={currentUser.avatar} alt="profile" />
-
-          ): (<li className=" text-slate-700 hover:underline">Sign in</li>
-          )}
-          
-           </Link> 
-          
+          <Link to="/profile">
+            {userData2 ? (
+              <img
+                className="rounded-full h-10 w-10 object-cover"
+                src={userData2.avatar}
+                alt="profile"
+              />
+            ) : (
+              <li className=" text-slate-700 hover:underline">Sign in</li>
+            )}
+          </Link>
         </ul>
       </div>
     </header>
