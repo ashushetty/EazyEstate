@@ -50,3 +50,28 @@ export const updateUser = async (req,res) =>{
         return send(res,RESPONSE.UNKNOW_ERROR)
     }
 }
+
+export const deleteUser = async (req, res, next) =>{
+    try {
+        if(req.user.id !== req.params.id) {
+            const updatedResponse = setErrResMsg(RESPONSE.UNAUTHORIZED,"Unauthorized..!")
+            return send(res, updatedResponse)
+        }
+
+        const userModel = await inituserData();
+        const userToDelete = await userModel.findOne({
+            where: {
+                user_id: req.params.id
+            }
+        });
+
+        if(userToDelete) {
+            await userToDelete.destroy();
+            return send(res, RESPONSE.SUCCESS, { message: "User deleted successfully." });
+        } else {
+            return send(res, RESPONSE.NOT_FOUND);
+        }
+    } catch(err) {
+        return send(res, RESPONSE.UNKNOW_ERROR);
+    }
+}

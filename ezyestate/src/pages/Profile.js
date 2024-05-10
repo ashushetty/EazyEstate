@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { useRef, useState, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -11,6 +12,9 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -24,6 +28,7 @@ function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const access_token = localStorage.getItem("access_token");
   const userData = localStorage.getItem("user_data");
@@ -31,7 +36,11 @@ function Profile() {
   const userData2 = JSON.parse(userData);
 
   //  console.log(userData2);
-  //  console.log(userData2.responseData.data.avatar)
+  const avatar = userData2.responseData?.data?.avatar;
+  if (avatar) {
+    console.log(avatar);
+  }
+  
   // console.log(filePerc);
   // console.log(fileUploadError);
   useEffect(() => {
@@ -111,6 +120,28 @@ function Profile() {
       dispatch(updateUserFailure(err));
     }
   };
+  const handleDeleteUser = async ()=>{
+    try{
+      dispatch(deleteUserStart());
+      const res = await fetch ( `http://localhost:4000/api/user/delete/${decoded.id}`,{
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          access_token: access_token,
+        },
+      });
+      const data = await res.json();
+        if(data.success === false){
+          dispatch(deleteUserFailure(data.message))
+        }
+        dispatch(deleteUserSuccess(data));
+        localStorage.removeItem("user_data");
+        navigate("/login");
+    }catch(error){
+      dispatch(deleteUserFailure(error.message))
+
+    }
+  }
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -177,7 +208,7 @@ function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-400 cursor-pointer">Delete Account</span>
+        <span  onClick={handleDeleteUser}  className="text-red-400 cursor-pointer">Delete Account</span>
         <span className="text-red-400 cursor-pointer">Sign out</span>
       </div>
     </div>
