@@ -15,6 +15,9 @@ import {
   deleteUserFailure,
   deleteUserStart,
   deleteUserSuccess,
+  logoutUserStart,
+  logoutUserSuccess,
+  logoutUserFailure,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -136,12 +139,26 @@ function Profile() {
         }
         dispatch(deleteUserSuccess(data));
         localStorage.removeItem("user_data");
-        navigate("/login");
     }catch(error){
       dispatch(deleteUserFailure(error.message))
 
     }
   }
+
+  const handleSignOut = () => {
+    try {
+      dispatch(logoutUserStart());
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user_data");
+      dispatch(logoutUserSuccess());
+      toast.success("Logged Out Successfully!!!")
+    } catch (error) {
+      toast.error("Couldn't Logout!,try again")
+      dispatch(logoutUserFailure());
+    }
+  };
+  
+  
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -209,7 +226,7 @@ function Profile() {
       </form>
       <div className="flex justify-between mt-5">
         <span  onClick={handleDeleteUser}  className="text-red-400 cursor-pointer">Delete Account</span>
-        <span className="text-red-400 cursor-pointer">Sign out</span>
+        <span onClick={handleSignOut} className="text-red-400 cursor-pointer">Sign out</span>
       </div>
     </div>
   );
