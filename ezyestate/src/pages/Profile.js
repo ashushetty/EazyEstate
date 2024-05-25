@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useRef, useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -223,6 +223,9 @@ function Profile() {
         >
           Update
         </button>
+        <Link  className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95"  to ={"/create-listing"}>
+          Create Listing
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
         <span  onClick={handleDeleteUser}  className="text-red-400 cursor-pointer">Delete Account</span>

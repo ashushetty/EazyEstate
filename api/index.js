@@ -6,7 +6,8 @@ import getConnection from "./database.js";
 import path from "path";
 import cors from "cors"
 import userRouter from "./routes/user.routes.js";
-import authRouter from "./routes/auth.route.js"
+import authRouter from "./routes/auth.route.js";
+import listingRouter from "./routes/listing.route.js";
 import cookieParser from 'cookie-parser';
 
 const __dirname = path.resolve();
@@ -27,3 +28,4 @@ app.listen(PORT, () => {
 
 app.use('/api/user',userRouter);
 app.use('/api/auth',authRouter);
+app.use('/api/listing',listingRouter);
