@@ -2,6 +2,7 @@ import RESPONSE from "../config/global.js"
 import { send, setErrResMsg } from "../helper/responseHelper.js"
 import bcrypt from 'bcrypt';
 import inituserData from "../models/user.model.js";
+import initListing from "../models/listing.model.js";
 
 export const test=(req,res) =>{
     res.send("hello world")
@@ -73,5 +74,27 @@ export const deleteUser = async (req, res, next) =>{
         }
     } catch(err) {
         return send(res, RESPONSE.UNKNOW_ERROR);
+    }
+};
+
+export const getUserListings = async( req, res) =>{
+    if( req.user.id === req.params.id){
+
+        try{
+         const newlisting= await initListing();
+         const listings = await newlisting.findAll({
+            where:{
+                userRef: req.params.id
+            }
+            });
+            return send(res, RESPONSE.SUCCESS, listings);
+        }catch(error){
+            return send(error.message)
+
+        }
+
+    }else{
+        return send(res,RESPONSE.UNAUTHORIZED,"Unauthorized..!")
+
     }
 }
