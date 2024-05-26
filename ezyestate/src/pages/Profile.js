@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
+  list,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
@@ -30,6 +31,8 @@ function Profile() {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [showListingError, setShowListingsError] = useState(false);
+  const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -43,7 +46,7 @@ function Profile() {
   if (avatar) {
     console.log(avatar);
   }
-  
+
   // console.log(filePerc);
   // console.log(fileUploadError);
   useEffect(() => {
@@ -107,14 +110,13 @@ function Profile() {
       const data = await res.json();
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
-        toast.error("OOPs Profile update unsuccessfull!",data.message);
+        toast.error("OOPs Profile update unsuccessfull!", data.message);
         return;
       }
       toast.success("Profile updated successfully!");
       const updatedUserData = { ...userData2, ...formData };
       localStorage.setItem("user_data", JSON.stringify(updatedUserData));
 
-      
       // console.log(currentUser.user_id);
       // console.log("control comes here");
       // console.log(data, decoded);
@@ -123,27 +125,29 @@ function Profile() {
       dispatch(updateUserFailure(err));
     }
   };
-  const handleDeleteUser = async ()=>{
-    try{
+  const handleDeleteUser = async () => {
+    try {
       dispatch(deleteUserStart());
-      const res = await fetch ( `http://localhost:4000/api/user/delete/${decoded.id}`,{
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          access_token: access_token,
-        },
-      });
-      const data = await res.json();
-        if(data.success === false){
-          dispatch(deleteUserFailure(data.message))
+      const res = await fetch(
+        `http://localhost:4000/api/user/delete/${decoded.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            access_token: access_token,
+          },
         }
-        dispatch(deleteUserSuccess(data));
-        localStorage.removeItem("user_data");
-    }catch(error){
-      dispatch(deleteUserFailure(error.message))
-
+      );
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+      }
+      dispatch(deleteUserSuccess(data));
+      localStorage.removeItem("user_data");
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
     }
-  }
+  };
 
   const handleSignOut = () => {
     try {
@@ -151,14 +155,38 @@ function Profile() {
       localStorage.removeItem("access_token");
       localStorage.removeItem("user_data");
       dispatch(logoutUserSuccess());
-      toast.success("Logged Out Successfully!!!")
+      toast.success("Logged Out Successfully!!!");
     } catch (error) {
-      toast.error("Couldn't Logout!,try again")
+      toast.error("Couldn't Logout!,try again");
       dispatch(logoutUserFailure());
     }
   };
-  
-  
+
+  const handleShowListings = async () => {
+    try {
+      setShowListingsError(false);
+
+      const res = await fetch(
+        `http://localhost:4000/api/user/listings/${decoded.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            access_token: access_token,
+          },
+        }
+      );
+
+      const data = await res.json();
+      if (data.success === false) {
+        setShowListingsError(true);
+        return;
+      }
+      setUserListings(data);
+    } catch (error) {
+      setShowListingsError(true);
+    }
+  };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -173,7 +201,11 @@ function Profile() {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={formData.avatar || userData2?.avatar||userData2?.responseData?.data?.avatar}
+          src={
+            formData.avatar ||
+            userData2?.avatar ||
+            userData2?.responseData?.data?.avatar
+          }
           alt="profile"
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
         />
@@ -195,7 +227,9 @@ function Profile() {
           id="username"
           placeholder="username"
           required
-          defaultValue={currentUser.username||userData2?.responseData?.data?.username }
+          defaultValue={
+            currentUser.username || userData2?.responseData?.data?.username
+          }
           className="border p-3 rounded-lg"
           value={formData.username}
           onChange={handleChange}
@@ -204,7 +238,9 @@ function Profile() {
           type="email"
           id="email"
           placeholder="email"
-          defaultValue={currentUser.email||userData2?.responseData?.data?.email}
+          defaultValue={
+            currentUser.email || userData2?.responseData?.data?.email
+          }
           className="border p-3 rounded-lg"
           onChange={handleChange}
           value={formData.email}
@@ -216,24 +252,65 @@ function Profile() {
           className="border p-3 rounded-lg"
           onChange={handleChange}
         />
-  
+
         <button
           type="submit"
           className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
         >
           Update
         </button>
-        <Link  className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95"  to ={"/create-listing"}>
+        <Link
+          className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95"
+          to={"/create-listing"}
+        >
           Create Listing
         </Link>
       </form>
       <div className="flex justify-between mt-5">
-        <span  onClick={handleDeleteUser}  className="text-red-400 cursor-pointer">Delete Account</span>
-        <span onClick={handleSignOut} className="text-red-400 cursor-pointer">Sign out</span>
+        <span
+          onClick={handleDeleteUser}
+          className="text-red-400 cursor-pointer"
+        >
+          Delete Account
+        </span>
+        <span onClick={handleSignOut} className="text-red-400 cursor-pointer">
+          Sign out
+        </span>
       </div>
+      <button onClick={handleShowListings} className="text-green-700 w-full ">
+        Show Listings
+      </button>
+      <p className="text-red-700 mt-5">
+        {showListingError ? "Error showing listings" : ""}
+      </p>
+
+      {userListings &&
+        userListings.responseData &&
+        userListings.responseData.length > 0 &&
+        <div className="flex flex-col gap-4">
+          <h1 className="text-center mt-7 text-2xl font-semibold ">Your Listings</h1>
+        {userListings.responseData.map((listing) => (
+          <div key={listing.id} className="border rounded-lg p-3 flex justify-between items-center gap-4 ">
+            <Link to={`/listing/${listing.id}`}>
+              <img
+                src={listing.imageUrls[0]}
+                alt="listing cover"
+                className="h-16 w-16 object-contain"
+              ></img>
+            </Link>
+            <Link className="text-slate-700 font-semibold  hover:underline truncate flex-1" to={`/listing/${listing.id}`}>
+              <p>{listing.name}</p>
+            </Link>
+            <div className="flex flex-col items-center">
+              <button className="text-red-700 uppercase">Delete</button>
+              <button className="text-green-700 uppercase">Edit</button>
+
+            </div>
+          </div>
+        ))}
+        </div>}
     </div>
   );
-  
 }
 
 export default Profile;
