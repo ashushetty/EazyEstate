@@ -61,3 +61,30 @@ export const deleteListing = async (req, res,) =>{
             return send(res, RESPONSE.UNKNOW_ERROR);
         }
 }
+
+
+export const updateListing = async (req, res) => {
+  try {
+    const listingModel = await initListing();
+    const listingToUpdate = await listingModel.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (!listingToUpdate) {
+      return send(res, RESPONSE.NOT_FOUND, { message: "Listing not found" });
+    }
+
+    if (req.user.id !== listingToUpdate.userRef.toString()) {
+      return send(res, RESPONSE.ACCESS_DENIED);
+    }
+
+    await listingToUpdate.update(req.body);
+    return send(res, RESPONSE.SUCCESS, listingToUpdate);
+
+  } catch (err) {
+    console.error("listing-controller-error:", err.message);
+    return send(res, RESPONSE.UNKNOW_ERROR);
+  }
+};
