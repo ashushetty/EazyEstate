@@ -88,3 +88,22 @@ export const updateListing = async (req, res) => {
     return send(res, RESPONSE.UNKNOW_ERROR);
   }
 };
+
+export const getListing =async (req,res)=>{
+  try{
+    const listing = await initListing();
+    const getlisting = await listing.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+   if (!getlisting){
+    return send(res, RESPONSE.NOT_FOUND, { message: "Listing not found" });
+   }
+   return send(res,RESPONSE.SUCCESS,getlisting);
+
+  }catch(error){
+    return send(res, RESPONSE.UNKNOW_ERROR);
+  }
+
+}
