@@ -91,6 +91,7 @@ export default function CreateListing() {
 
   const handleChange = (e) => {
     const { id, value, checked, type } = e.target;
+  
     if (id === "sale" || id === "rent") {
       setFormData((prevFormData) => ({
         ...prevFormData,
@@ -104,10 +105,11 @@ export default function CreateListing() {
     } else {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        [id]: value,
+        [id]: type === "number" ? Number(value) : value,
       }));
     }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();

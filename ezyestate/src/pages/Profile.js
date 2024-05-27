@@ -188,6 +188,33 @@ function Profile() {
     }
   };
 
+  const handleListingDelete = async (listingId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:4000/api/listing/delete/${listingId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            access_token: access_token,
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.success == false) {
+        console.log(data.message);
+        return;
+      }
+
+      setUserListings((prev) =>({
+        ...prev,
+        responseData:prev.responseData.filter((listing) => listing.id !== listingId)
+     }));
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -286,29 +313,42 @@ function Profile() {
 
       {userListings &&
         userListings.responseData &&
-        userListings.responseData.length > 0 &&
-        <div className="flex flex-col gap-4">
-          <h1 className="text-center mt-7 text-2xl font-semibold ">Your Listings</h1>
-        {userListings.responseData.map((listing) => (
-          <div key={listing.id} className="border rounded-lg p-3 flex justify-between items-center gap-4 ">
-            <Link to={`/listing/${listing.id}`}>
-              <img
-                src={listing.imageUrls[0]}
-                alt="listing cover"
-                className="h-16 w-16 object-contain"
-              ></img>
-            </Link>
-            <Link className="text-slate-700 font-semibold  hover:underline truncate flex-1" to={`/listing/${listing.id}`}>
-              <p>{listing.name}</p>
-            </Link>
-            <div className="flex flex-col items-center">
-              <button className="text-red-700 uppercase">Delete</button>
-              <button className="text-green-700 uppercase">Edit</button>
-
-            </div>
+        userListings.responseData.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <h1 className="text-center mt-7 text-2xl font-semibold ">
+              Your Listings
+            </h1>
+            {userListings.responseData.map((listing) => (
+              <div
+                key={listing.id}
+                className="border rounded-lg p-3 flex justify-between items-center gap-4 "
+              >
+                <Link to={`/listing/${listing.id}`}>
+                  <img
+                    src={listing.imageUrls[0]}
+                    alt="listing cover"
+                    className="h-16 w-16 object-contain"
+                  ></img>
+                </Link>
+                <Link
+                  className="text-slate-700 font-semibold  hover:underline truncate flex-1"
+                  to={`/listing/${listing.id}`}
+                >
+                  <p>{listing.name}</p>
+                </Link>
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => handleListingDelete(listing.id)}
+                    className="text-red-700 uppercase"
+                  >
+                    Delete
+                  </button>
+                  <button className="text-green-700 uppercase">Edit</button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-        </div>}
+        )}
     </div>
   );
 }

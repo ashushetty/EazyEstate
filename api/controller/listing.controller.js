@@ -29,3 +29,35 @@ export const createListing = async (req, res) => {
         return send(res, RESPONSE.UNKNOW_ERROR);
     }
 };
+
+
+export const deleteListing = async (req, res,) =>{
+    const listingModel = await initListing();
+        const listingToDelete = await listingModel.findOne({
+            where:{
+                id: req.params.id}
+            
+        });
+
+        if(!listingToDelete){
+            return send(res,RESPONSE.NOT_FOUND)
+
+        }
+        if(req.user.id != listingToDelete.userRef.toString()){
+            return send(res,RESPONSE.ACCESS_DENIED)
+        }
+
+        try{
+            
+            if(listingToDelete) {
+                await listingToDelete.destroy();
+                return send(res, RESPONSE.SUCCESS, { message: "listing deleted successfully." });
+            } else {
+                return send(res, RESPONSE.NOT_FOUND);
+            }
+        }
+
+        catch(error){
+            return send(res, RESPONSE.UNKNOW_ERROR);
+        }
+}
