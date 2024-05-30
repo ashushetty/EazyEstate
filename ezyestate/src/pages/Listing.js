@@ -4,6 +4,7 @@ import{Swiper, SwiperSlide} from 'swiper/react';
 import SwiperCore from 'swiper';
 import { Navigation} from 'swiper/modules';
 import 'swiper/css/bundle';
+import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking } from 'react-icons/fa';
 
 export default function Listing() {
     SwiperCore.use([Navigation]);
@@ -54,6 +55,60 @@ export default function Listing() {
             
             </>
         )}
+        <div className='flex flex-col items-center px-4 w-full max-w-5xl mx-auto gap-2'>
+    <p className='text-3xl  my-7 text-left w-full'>
+        {listing && listing.responseData && listing.responseData.name}
+        <span> - $</span>
+        {listing && listing.responseData &&
+            (listing.responseData.offer
+                ? listing.responseData.discountedPrice.toLocaleString('en-US')
+                : listing.responseData.regularPrice.toLocaleString('en-US'))}
+        {listing && listing.responseData && listing.responseData.type === 'rent' && '/month'}
+    </p>
+    <p className='flex items-center   gap-2 text-slate-600 my-2 text-sm w-full text-left'>
+        <FaMapMarkerAlt className='text-green-700' />
+        {listing && listing.responseData && listing.responseData.address}
+    </p>
+    <div className='flex gap-3 w-full text-left'>
+        <p className='bg-red-900 w-full max-w-[200px] text-white text-center p-1  rounded-md'>
+            {listing && listing.responseData && listing.responseData.type === 'rent' ? 'For Rent' : 'For Sale'}
+        </p>
+        {listing && listing.responseData && listing.responseData.offer && (
+            <p className='bg-green-900 w-full max-w-[200px] text-white text-center p-1  rounded-md'>
+                ${+listing.responseData.regularPrice - +listing.responseData.discountedPrice}
+            </p>
+        )}
+    </div>
+    <p className='text-slate-800 text-left w-full'>
+        <span className='font-semibold text-black'>
+            Description -{' '}
+        </span>
+        {listing && listing.responseData && listing.responseData.description}
+    </p>
+    <ul className='text-green-900 font-semibold text-sm flex  flex-wrap items-center gap-5 sm:gap-6  w-full text-left'>
+        <li className='flex items-center gap-1'>
+            <FaBed className='text-lg' />
+            {listing && listing.responseData && listing.responseData.bedrooms > 1
+                ? `${listing.responseData.bedrooms} beds`
+                : `${listing.responseData.bedrooms} bed`}
+        </li>
+        <li className='flex items-center gap-1'>
+            <FaBath className='text-lg' />
+            {listing && listing.responseData && listing.responseData.bathrooms > 1
+                ? `${listing.responseData.bathrooms} baths`
+                : `${listing.responseData.bathrooms} bath`}
+        </li>
+        <li className='flex items-center gap-1'>
+            <FaParking className='text-lg' />
+            {listing && listing.responseData && listing.responseData.parking ? 'Parking spot': 'No parking'}
+        </li>
+        <li className='flex items-center gap-1'>
+            <FaChair className='text-lg' />
+            {listing && listing.responseData && listing.responseData.furnished? 'Furnished': 'Not furnished'}
+        </li>
+    </ul>
+</div>
+
     </main>
   )
 }

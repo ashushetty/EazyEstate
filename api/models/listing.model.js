@@ -12,7 +12,7 @@ const listingModel= {
         allowNUll:false,
     },
     description:{
-        type:DataTypes.STRING,
+        type:DataTypes.STRING(500),
         allowNUll:false,
     },
     address:{
